@@ -1,8 +1,9 @@
 import 'package:contact_plus_apk/firebase_options.dart';
-import 'package:contact_plus_apk/login.dart';
-import 'package:contact_plus_apk/splashScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'package:contact_plus_apk/login.dart';
+import 'package:contact_plus_apk/splashScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
