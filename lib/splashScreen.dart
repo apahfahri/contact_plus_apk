@@ -11,33 +11,37 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _GoToNavigationToHome();
+    _navigateToLogin();
   }
 
-  _GoToNavigationToHome() async {
+  void _navigateToLogin() async {
     await Future.delayed(const Duration(seconds: 5));
     Navigator.pushReplacementNamed(context, 'login_screen');
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E1E2A), // Background color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image(
+            const Image(
               image: AssetImage('assets/images/splash.png'),
               width: 300,
               height: 300,
             ),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'CONTACT+',
               style: TextStyle(
                 fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            )
+            ),
           ],
         ),
       ),

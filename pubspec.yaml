@@ -21,4 +21,6 @@ flutter:
   uses-material-design: true
 
   assets:
-  - assets/images/
+  - assets/images/splash.png
+  - assets/images/Key opening a lock.png
+  - assets/images/contacts icon.png
