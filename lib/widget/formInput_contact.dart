@@ -24,7 +24,7 @@ class Forminput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Input Nama
-        TextField(
+        TextFormField(
           controller: namaController,
           decoration: InputDecoration(
             labelText: 'Nama',
@@ -37,11 +37,21 @@ class Forminput extends StatelessWidget {
             prefixIcon: const Icon(Icons.person), // Ikon untuk nama
           ),
           style: const TextStyle(color: Colors.black),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Nama tidak boleh kosong';
+            }
+            // Nama boleh huruf dan angka
+            if (!RegExp(r'^[a-zA-Z0-9 ]*$').hasMatch(value)) {
+              return 'Nama hanya boleh huruf dan angka';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
 
         // Input Nomor Telepon
-        TextField(
+        TextFormField(
           controller: nomerController,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
@@ -55,11 +65,21 @@ class Forminput extends StatelessWidget {
             prefixIcon: const Icon(Icons.phone), // Ikon untuk nomor telepon
           ),
           style: const TextStyle(color: Colors.black),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Nomor telepon tidak boleh kosong';
+            }
+            // Nomor telepon harus angka dan minimal 11 digit
+            if (!RegExp(r'^[0-9]{11,}$').hasMatch(value)) {
+              return 'Nomor telepon harus berupa angka dan minimal 11 digit';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
 
         // Input Email
-        TextField(
+        TextFormField(
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
@@ -73,11 +93,22 @@ class Forminput extends StatelessWidget {
             prefixIcon: const Icon(Icons.email), // Ikon untuk email
           ),
           style: const TextStyle(color: Colors.black),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Email tidak boleh kosong';
+            }
+            // Validasi email
+            if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                .hasMatch(value)) {
+              return 'Email tidak valid';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
 
         // Input Alamat
-        TextField(
+        TextFormField(
           controller: alamatController,
           decoration: InputDecoration(
             labelText: 'Alamat',
@@ -90,11 +121,17 @@ class Forminput extends StatelessWidget {
             prefixIcon: const Icon(Icons.location_on), // Ikon untuk alamat
           ),
           style: const TextStyle(color: Colors.black),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Alamat tidak boleh kosong';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 16),
 
         // Input Catatan
-        TextField(
+        TextFormField(
           controller: noteController,
           maxLines: 3,
           decoration: InputDecoration(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:contact_plus_apk/widget/formInput_contact.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddContact extends StatefulWidget {
@@ -10,16 +9,15 @@ class AddContact extends StatefulWidget {
 }
 
 class _AddContactState extends State<AddContact> {
-  // Inisialisasi TextEditingController
   final TextEditingController namaController = TextEditingController();
   final TextEditingController nomerController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    // Bersihkan controller saat widget dihancurkan
     namaController.dispose();
     nomerController.dispose();
     emailController.dispose();
@@ -29,37 +27,34 @@ class _AddContactState extends State<AddContact> {
   }
 
   void onSave() async {
-  // Data yang akan disimpan
-  final Map<String, dynamic> contactData = {
-    'nama': namaController.text,
-    'nomor': nomerController.text,
-    'email': emailController.text,
-    'alamat': alamatController.text,
-    'catatan': noteController.text,
-  };
+    if (_formKey.currentState!.validate()) {
+      final Map<String, dynamic> contactData = {
+        'nama': namaController.text,
+        'nomor': nomerController.text,
+        'email': emailController.text,
+        'alamat': alamatController.text,
+        'catatan': noteController.text,
+      };
 
-  try {
-    // Menyimpan data ke koleksi 'contact'
-    await FirebaseFirestore.instance.collection('contact').add(contactData);
+      try {
+        await FirebaseFirestore.instance.collection('contact').add(contactData);
 
-    // Tampilkan pesan sukses
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Data berhasil disimpan ')),
-    );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data berhasil disimpan')),
+        );
 
-    // Bersihkan field setelah menyimpan data
-    namaController.clear();
-    nomerController.clear();
-    emailController.clear();
-    alamatController.clear();
-    noteController.clear();
-  } catch (e) {
-    // Tampilkan pesan error
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Terjadi kesalahan: $e')),
-    );
+        namaController.clear();
+        nomerController.clear();
+        emailController.clear();
+        alamatController.clear();
+        noteController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $e')),
+        );
+      }
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -67,61 +62,158 @@ class _AddContactState extends State<AddContact> {
       backgroundColor: const Color(0xFF23253A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF23253A),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
         title: const Text(
-          'Add Contact',
+          'Add My Contact+',
           style: TextStyle(color: Colors.white),
         ),
+        centerTitle: true,
       ),
-      body: Column(
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: <Widget>[
-    Card(
-      color: const Color(0xFF383B4E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Container dengan ikon user berbentuk lingkaran di tengah
-            Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.person,
-                  size: 40,
-                  color: Colors.black,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Avatar Icon
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Colors.blue, Colors.lightBlueAccent],
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Tambah Kontak',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Input Fields
+                _buildInputField(
+                  controller: namaController,
+                  hintText: 'Nama',
+                  icon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: nomerController,
+                  hintText: 'Telepon',
+                  icon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nomor telepon tidak boleh kosong';
+                    } else if (!RegExp(r'^[0-9]{11,}$').hasMatch(value)) {
+                      return 'Data harus berupa angka minimal 11 angka';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  icon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email tidak boleh kosong';
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
+                      return 'Masukkan format email yang benar';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: alamatController,
+                  hintText: 'Alamat',
+                  icon: Icons.location_on,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Alamat tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: noteController,
+                  hintText: 'Notes',
+                  icon: Icons.note,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: onSave,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 40),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'Tambah',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20), // Memberikan jarak antara icon dan form
-            // Forminput di bawah icon
-            Forminput(
-              namaController: namaController,
-              nomerController: nomerController,
-              emailController: emailController,
-              alamatController: alamatController,
-              noteController: noteController,
-              onSave: onSave,
-            ),
-          ],
+          ),
         ),
       ),
-    ),
-  ],
-),
+    );
+  }
 
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    int maxLines = 1,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        validator: validator,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.blue),
+          filled: true,
+          fillColor: const Color(0xFFEEEEEE),
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
     );
   }
 }
-
-// Widget Forminput tetap sama seperti yang telah Anda berikan sebelumnya.
