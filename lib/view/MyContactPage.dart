@@ -163,9 +163,16 @@ class _MyContactPageState extends State<MyContactPage> {
                     final contacts = snapshot.data!.docs;
                     final filteredContacts = contacts.where((contact) {
                       final nama = contact['nama'] ?? '';
-                      return nama
-                          .toLowerCase()
-                          .contains(_searchText.toLowerCase());
+                      final nomorTelepon = contact['nomor'] ?? '';
+                      final email = contact['email'] ?? '';
+                      final alamat = contact['alamat'] ?? '';
+                      final catatan = contact['catatan'] ?? '';
+                      final searchLower = _searchText.toLowerCase();
+                      return nama.toLowerCase().contains(searchLower) ||
+                          nomorTelepon.toLowerCase().contains(searchLower) ||
+                          email.toLowerCase().contains(searchLower) ||
+                          alamat.toLowerCase().contains(searchLower) ||
+                          catatan.toLowerCase().contains(searchLower);
                     }).toList();
 
                     if (filteredContacts.isEmpty) {
