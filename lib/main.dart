@@ -1,6 +1,8 @@
 import 'package:contact_plus_apk/view/register.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:device_preview/device_preview.dart';
 
 // Pages
 import 'package:contact_plus_apk/service/firebase_options.dart';
@@ -15,10 +17,15 @@ import 'package:contact_plus_apk/view/edit_contact.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainApp());
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const MainApp(),)
+    );
 }
 
 class MainApp extends StatelessWidget {

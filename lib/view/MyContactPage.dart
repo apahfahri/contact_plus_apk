@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
-
-//firebase packages
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyContactPage extends StatefulWidget {
@@ -14,6 +12,18 @@ class MyContactPage extends StatefulWidget {
 
 class _MyContactPageState extends State<MyContactPage> {
   int _selectedIndex = 0;
+  TextEditingController _searchController = TextEditingController();
+  String _searchText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchText = _searchController.text;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,17 +74,14 @@ class _MyContactPageState extends State<MyContactPage> {
               tabBackgroundColor: Colors.grey[100]!,
               color: Colors.white,
               tabs: const [
-                // GButton untuk dashboard_user
                 GButton(
                   icon: LineIcons.phone,
                   text: 'Contact',
                 ),
-                // GButton untuk favorite_pages
                 GButton(
                   icon: LineIcons.heart,
                   text: 'Favorite',
                 ),
-                // GButton untuk profile_pages
                 GButton(
                   icon: LineIcons.user,
                   text: 'Profile',
@@ -109,6 +116,7 @@ class _MyContactPageState extends State<MyContactPage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xFF383B4E),
@@ -131,12 +139,10 @@ class _MyContactPageState extends State<MyContactPage> {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: StreamBuilder<QuerySnapshot>(
-                  // Ambil data dari koleksi 'contact'
                   stream: FirebaseFirestore.instance
                       .collection('contact')
                       .snapshots(),
                   builder: (context, snapshot) {
-                    // Periksa apakah ada data atau error
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
@@ -154,14 +160,18 @@ class _MyContactPageState extends State<MyContactPage> {
                       );
                     }
 
-                    // Ambil data dari snapshot
                     final contacts = snapshot.data!.docs;
+                    final filteredContacts = contacts.where((contact) {
+                      final nama = contact['nama'] ?? '';
+                      return nama
+                          .toLowerCase()
+                          .contains(_searchText.toLowerCase());
+                    }).toList();
 
-                    // Periksa apakah data kosong
-                    if (contacts.isEmpty) {
+                    if (filteredContacts.isEmpty) {
                       return const Center(
                         child: Text(
-                          'Belum ada pengajuan bimbingan.',
+                          'Kontak tidak ditemukan.',
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       );
@@ -170,11 +180,10 @@ class _MyContactPageState extends State<MyContactPage> {
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: contacts.length,
+                      itemCount: filteredContacts.length,
                       itemBuilder: (context, index) {
-                        final contact = contacts[index];
-                        final nama = contact['nama'] ??
-                            'Nama tidak tersedia'; // Ambil field 'nama'
+                        final contact = filteredContacts[index];
+                        final nama = contact['nama'] ?? 'Nama tidak tersedia';
 
                         return Container(
                           padding: const EdgeInsets.all(10),
@@ -187,13 +196,11 @@ class _MyContactPageState extends State<MyContactPage> {
                             leading: const Icon(Icons.person),
                             title: Text(nama),
                             onTap: () {
-                              final contactId = contact
-                                  .id; // Get the contact ID from the Firestore document
+                              final contactId = contact.id;
                               Navigator.pushNamed(
                                 context,
                                 'detail_contact',
-                                arguments:
-                                    contactId, // Pass the contact ID as the argument
+                                arguments: contactId,
                               );
                             },
                             trailing: Row(
@@ -210,7 +217,6 @@ class _MyContactPageState extends State<MyContactPage> {
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   onPressed: () async {
-                                    // Hapus kontak berdasarkan ID dokumen
                                     await FirebaseFirestore.instance
                                         .collection('contact')
                                         .doc(contact.id)
@@ -239,55 +245,3 @@ class _MyContactPageState extends State<MyContactPage> {
     );
   }
 }
-
-//  // Daftar kontak
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//               child: Column(
-//                 children: [
-//                   _buildContactCard("Deddy Corbuzier"),
-//                   _buildContactCard("Rina Nose"),
-//                   _buildContactCard("Fajar Sadboy"),
-//                   _buildContactCard("Vidi Aldiano"),
-//                 ],
-//               ),
-//             ),
-//             // Tombol Tambah Kontak
-//             Padding(
-//               padding: const EdgeInsets.all(16.0),
-//             ),
-
-// Widget _buildContactCard(String name) {
-//     return Container(
-//       margin: const EdgeInsets.only(bottom: 16),
-//       decoration: BoxDecoration(
-//         color: const Color(0xFF383B4E),
-//         borderRadius: BorderRadius.circular(20),
-//       ),
-//       child: ListTile(
-//         leading: const CircleAvatar(
-//           backgroundColor: Color(0xFF3A89D5),
-//           child: Icon(Icons.person, color: Colors.white),
-//         ),
-//         title: Text(
-//           name,
-//           style: const TextStyle(color: Colors.white, fontSize: 16),
-//         ),
-//         trailing: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             IconButton(
-//               icon: const Icon(Icons.favorite_border, color: Colors.white),
-//               onPressed: () {
-//                 // Logika untuk menambahkan ke favorit
-//               },
-//             ),
-//             IconButton(
-//               icon: const Icon(Icons.delete, color: Colors.white),
-//               onPressed: () {},
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
