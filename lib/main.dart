@@ -1,10 +1,17 @@
-import 'package:contact_plus_apk/register.dart';
+import 'package:contact_plus_apk/view/register.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:contact_plus_apk/firebase_options.dart';
-import 'package:contact_plus_apk/login.dart';
-import 'package:contact_plus_apk/splashScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+// Pages
+import 'package:contact_plus_apk/service/firebase_options.dart';
+import 'package:contact_plus_apk/view/login.dart';
+import 'package:contact_plus_apk/view/splashScreen.dart';
+import 'package:contact_plus_apk/view/MyContactPage.dart';
+import 'package:contact_plus_apk/view/add_contact.dart';
+import 'package:contact_plus_apk/view/favorite_contact.dart';
+import 'package:contact_plus_apk/view/profile_user.dart';
+import 'package:contact_plus_apk/view/detail_contact.dart';
+import 'package:contact_plus_apk/view/edit_contact.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,61 +33,21 @@ class MainApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: 'splash_screen', // Splash screen yang pertama kali tampil
+      initialRoute: 'splash_screen',
       routes: {
         'splash_screen': (context) => const SplashScreen(),
         'login_screen': (context) => const LoginPage(),
         'register_screen': (context) => const RegisterPage(),
-      },
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _checkIfLoggedIn();
-  }
-
-  void _checkIfLoggedIn() async {
-    // Cek apakah user sudah login
-    final user = FirebaseAuth.instance.currentUser;
-    await Future.delayed(
-        const Duration(seconds: 3)); // Delay untuk splash screen
-    if (user != null) {
-      // Jika sudah login, arahkan ke MyContactPage
-      Navigator.pushReplacementNamed(context, 'login_screen');
-    } else {
-      // Jika belum login, arahkan ke login screen
-      Navigator.pushReplacementNamed(context, 'login_screen');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF23253A),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 20),
-            Text(
-              "CONTACT+",
-              style: TextStyle(color: Colors.white, fontSize: 32),
+        'dashboard_user': (context) => const MyContactPage(),
+        'add_contact': (context) => const AddContact(),
+        'favorite_pages': (context) => const FavoriteContact(),
+        'profile_pages': (context) => const ProfileUser(),
+        
+        'detail_contact': (context) => DetailContact(
+              contactId: ModalRoute.of(context)?.settings.arguments as String,
             ),
-          ],
-        ),
-      ),
+        'edit_contact': (context) => const EditContact(),
+      },
     );
   }
 }

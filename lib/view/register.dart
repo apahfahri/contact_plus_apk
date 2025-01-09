@@ -103,18 +103,18 @@ class RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 // Teks Register
-                Text(
+                const Text(
                   "Register",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   "Please register to login",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
                   ),
@@ -170,6 +170,7 @@ class RegisterPageState extends State<RegisterPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -178,17 +179,17 @@ class RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Already have account? ",
-                      style: const TextStyle(color: Colors.white70),
+                      style: TextStyle(color: Colors.white70),
                     ),
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, 'login_screen');
                       },
-                      child: Text(
+                      child: const Text(
                         "Sign In",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFF3A89D5),
                           fontWeight: FontWeight.bold,
                         ),
@@ -211,7 +212,7 @@ class RegisterPageState extends State<RegisterPage> {
     required String? Function(String?) validator,
     bool obscureText = false,
   }) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width * 0.8,
       child: TextFormField(
         controller: controller,

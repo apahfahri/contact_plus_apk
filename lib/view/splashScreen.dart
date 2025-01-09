@@ -15,26 +15,26 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToLogin() async {
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 3));
     Navigator.pushReplacementNamed(context, 'login_screen');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1E1E2A), // Background color
+    return const Scaffold(
+      backgroundColor: Color(0xFF1E1E2A), // Background color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Image(
+            Image(
               image: AssetImage('assets/images/splash.png'),
               width: 300,
               height: 300,
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               'CONTACT+',
               style: TextStyle(
                 fontSize: 40,

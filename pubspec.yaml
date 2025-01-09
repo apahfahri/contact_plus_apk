@@ -6,11 +6,21 @@ version: 0.1.0
 environment:
   sdk: ^3.5.3
 
+
 dependencies:
   flutter:
     sdk: flutter
+  #packge buttom navbar
+  google_nav_bar: ^5.0.7
+  #dependenci firebase
   firebase_core: ^3.9.0
   firebase_auth: ^5.3.4
+  cloud_firestore: 
+
+  #icons
+  line_icons: ^2.0.3
+  file_picker: ^8.1.7
+  
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +34,4 @@ flutter:
   - assets/images/splash.png
   - assets/images/Key opening a lock.png
   - assets/images/contacts icon.png
+

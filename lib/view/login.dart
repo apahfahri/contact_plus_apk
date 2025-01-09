@@ -1,4 +1,4 @@
-import 'package:contact_plus_apk/MyContactPage.dart';
+import 'package:contact_plus_apk/view/MyContactPage.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import 'package:flutter/material.dart';
 
@@ -35,9 +35,9 @@ class LoginPageState extends State<LoginPage> {
                 ),
               ),
               // Teks Login
-              Text(
+              const Text(
                 "Login",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -45,9 +45,9 @@ class LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 8),
               // Subtitle
-              Text(
+              const Text(
                 "Please Sign In to continue",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
                 ),
@@ -90,6 +90,7 @@ class LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                 ),
@@ -99,18 +100,18 @@ class LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Don't have an account? ",
-                    style: const TextStyle(color: Colors.white70),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   GestureDetector(
                     onTap: () {
                       // Navigasi ke halaman register
                       Navigator.pushNamed(context, 'register_screen');
                     },
-                    child: Text(
+                    child: const Text(
                       "Sign Up",
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFF3A89D5),
                         fontWeight: FontWeight.bold,
                       ),
@@ -126,7 +127,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   // Fungsi login dengan Firebase
-  Future<void> _login() async {
+  Future<void> _login() async { 
     setState(() {
       _isLoading = true;
     });
@@ -171,7 +172,7 @@ class LoginPageState extends State<LoginPage> {
     required IconData icon,
     required bool obscureText,
   }) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width * 0.8,
       child: TextField(
         controller: controller,
