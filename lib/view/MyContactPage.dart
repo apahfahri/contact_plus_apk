@@ -1,10 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyContactPage extends StatefulWidget {
-  const MyContactPage({super.key});
+  final User user;
+  const MyContactPage({super.key, required this.user});
 
   @override
   _MyContactPageState createState() => _MyContactPageState();
@@ -15,9 +17,12 @@ class _MyContactPageState extends State<MyContactPage> {
   TextEditingController _searchController = TextEditingController();
   String _searchText = "";
 
+  late User currentUser;
+
   @override
   void initState() {
     super.initState();
+    currentUser = widget.user;
     _searchController.addListener(() {
       setState(() {
         _searchText = _searchController.text;
@@ -100,7 +105,7 @@ class _MyContactPageState extends State<MyContactPage> {
                     Navigator.pushNamed(context, 'favorite_pages');
                     break;
                   case 2:
-                    Navigator.pushNamed(context, 'profile_pages');
+                    Navigator.pushNamed(context, 'profile_pages', arguments: currentUser);
                     break;
                 }
               },

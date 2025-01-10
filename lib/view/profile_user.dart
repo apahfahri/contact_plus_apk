@@ -1,10 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 class ProfileUser extends StatefulWidget {
-  const ProfileUser({super.key});
+  final User user;
+  const ProfileUser({super.key, required this.user});
 
   @override
   State<ProfileUser> createState() => _ProfileUserState();
@@ -17,9 +19,12 @@ class _ProfileUserState extends State<ProfileUser> {
   String? _phone;
   File? _imageFile;
 
+  late User currentUser;
+
   @override
   void initState() {
     super.initState();
+    currentUser = widget.user;
     _fetchUserData();
   }
 
@@ -84,19 +89,33 @@ class _ProfileUserState extends State<ProfileUser> {
             const SizedBox(height: 30),
             // Menampilkan data pengguna
             Text(
-              'Username: ${_username ?? "Loading..."}',
+              'Username: ${currentUser.displayName ?? "nama pengguna"}',
               style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
             const SizedBox(height: 10),
             Text(
-              'Email: ${_email ?? "Loading..."}',
+              'Email: ${currentUser.email ?? "email pengguna"}',
               style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
             const SizedBox(height: 10),
             Text(
-              'Phone: ${_phone ?? "Loading..."}',
+              'Phone: ${currentUser.phoneNumber ?? "nomor telepon"}',
               style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
+            // Text(
+            //   'Username: ${_username ?? "Loading..."}',
+            //   style: const TextStyle(color: Colors.white, fontSize: 18),
+            // ),
+            // const SizedBox(height: 10),
+            // Text(
+            //   'Email: ${_email ?? "Loading..."}',
+            //   style: const TextStyle(color: Colors.white, fontSize: 18),
+            // ),
+            // const SizedBox(height: 10),
+            // Text(
+            //   'Phone: ${_phone ?? "Loading..."}',
+            //   style: const TextStyle(color: Colors.white, fontSize: 18),
+            // ),
           ],
         ),
       ),
