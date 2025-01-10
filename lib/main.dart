@@ -1,4 +1,5 @@
 import 'package:contact_plus_apk/view/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,11 +22,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => const MainApp(),)
-    );
+  runApp(DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (context) => const MainApp(),
+  ));
 }
 
 class MainApp extends StatelessWidget {
@@ -45,11 +45,10 @@ class MainApp extends StatelessWidget {
         'splash_screen': (context) => const SplashScreen(),
         'login_screen': (context) => const LoginPage(),
         'register_screen': (context) => const RegisterPage(),
-        'dashboard_user': (context) => const MyContactPage(),
+        // 'dashboard_user': (context) => const MyContactPage(user: null,),
         'add_contact': (context) => const AddContact(),
         'favorite_pages': (context) => const FavoriteContact(),
-        'profile_pages': (context) => const ProfileUser(),
-        
+        'profile_pages': (context) => ProfileUser(user: ModalRoute.of(context)!.settings.arguments as User),
         'detail_contact': (context) => DetailContact(
               contactId: ModalRoute.of(context)?.settings.arguments as String,
             ),
