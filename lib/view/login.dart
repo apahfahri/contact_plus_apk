@@ -139,11 +139,19 @@ class LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
 
-      // Jika login berhasil, arahkan ke MyContactPage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyContactPage()),
-      );
+      User? user = userCredential.user;
+
+      // Jika login berhasil dan user tidak null, arahkan ke MyContactPage
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login gagal. Coba lagi.')),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       // Menangani kesalahan login
       String errorMessage = '';
