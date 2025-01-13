@@ -9,7 +9,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:contact_plus_apk/service/firebase_options.dart';
 import 'package:contact_plus_apk/view/login.dart';
 import 'package:contact_plus_apk/view/splashScreen.dart';
-import 'package:contact_plus_apk/view/MyContactPage.dart';
+// import 'package:contact_plus_apk/view/MyContactPage.dart';
 import 'package:contact_plus_apk/view/add_contact.dart';
 import 'package:contact_plus_apk/view/favorite_contact.dart';
 import 'package:contact_plus_apk/view/profile_user.dart';

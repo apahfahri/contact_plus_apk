@@ -1,8 +1,11 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  
 
   @override
   RegisterPageState createState() => RegisterPageState();
@@ -16,6 +19,8 @@ class RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
+  late PhoneAuthCredential phone = _phoneController as PhoneAuthCredential;
+
   void _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -28,6 +33,10 @@ class RegisterPageState extends State<RegisterPage> {
           email: _emailController.text,
           password: _passwordController.text,
         );
+        await FirebaseAuth.instance.currentUser!
+            .updateDisplayName(_usernameController.text);
+        await FirebaseAuth.instance.currentUser!
+            .updatePhoneNumber(phone);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
@@ -60,7 +69,7 @@ class RegisterPageState extends State<RegisterPage> {
               children: [
                 // Icon Image
                 Image.asset(
-                  'assets/contacts icon.png',
+                  'assets/images/contacts icon.png',
                   width: 120,
                   height: 120,
                 ),
