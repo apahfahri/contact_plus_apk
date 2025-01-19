@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class ProfileUser extends StatefulWidget {
   final User user;
@@ -71,12 +73,57 @@ class _ProfileUserState extends State<ProfileUser> {
     }
   }
 
+   Future<void> exportDataToPDF() async {
+    try {
+      final pdf = pw.Document();
+
+      final data = await FirebaseFirestore.instance.collection('contact').where('uid_user',isEqualTo: currentUser.uid).get();
+
+
+      pdf.addPage(pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Daftar kontak dari akun ${currentUser.displayName}',
+                    style: pw.TextStyle(fontSize: 24)),
+                pw.SizedBox(height: 16),
+                pw.Table.fromTextArray(
+
+                  headers: ['ID', 'Nama', 'Nomor Telepon', 'Email', 'Alamat', 'Sebagai'],
+                  data: data.docs.map((doc) {
+                    final d = doc.data();
+                    return [
+                      doc.id,
+                      d['nama'] ?? '-',
+                      d['nomor'] ?? '-',
+                      d['email'] ?? '-',
+                      d['alamat'] ?? '-',
+                      d['catatan'] ?? '-',
+                    ];
+                  }).toList(),
+                )
+              ]);
+        },
+      ));
+
+      await Printing.sharePdf(
+        bytes: await pdf.save(),
+        filename: 'Daftar Kontak_${currentUser.displayName}.pdf',
+      );
+    } catch (e) {
+      print('Error exproting PDF: $e');
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
     currentUser = widget.user;
     _checkCurrentUser();
     fetchUserData();
+    super.initState();
   }
 
   void _checkCurrentUser() {
@@ -108,12 +155,9 @@ class _ProfileUserState extends State<ProfileUser> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(context, 'login_screen');
-            },
+           IconButton(
+            onPressed: exportDataToPDF,
+            icon: const Icon(Icons.import_export, color: Colors.white),
           ),
         ],
       ),

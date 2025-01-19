@@ -18,12 +18,28 @@ class MyContactPage extends StatefulWidget {
 class _MyContactPageState extends State<MyContactPage> {
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  String _searchText = "";
+  
   late User currentUser;
   String? _base64Image;
   // late Map<String, dynamic>? userData;
   late Map<String, dynamic>? userData = {};
   bool isLoading = true;
+  
+  String _searchText = "";
+  String _sortOrder = 'A-Z'; // Default sorting order
+
+
+  // Fungsi untuk mengurutkan kontak berdasarkan nama
+  List<QueryDocumentSnapshot> _sortContacts(
+      List<QueryDocumentSnapshot> contacts) {
+    if (_sortOrder == 'A-Z') {
+      contacts.sort((a, b) => (a['nama'] ?? '').compareTo(b['nama'] ?? ''));
+    } else if (_sortOrder == 'Z-A') {
+      contacts.sort((a, b) => (b['nama'] ?? '').compareTo(a['nama'] ?? ''));
+    }
+    return contacts;
+  }
+
 
   Future<void> fetchUserData() async {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -97,6 +113,7 @@ class _MyContactPageState extends State<MyContactPage> {
       });
       fetchUserData();
       _checkCurrentUser(); // Check current user and fetch image
+      _searchText = _searchController.text;
     } else {
       // Handle the case where the user is null (throw error or navigate to login)
       Navigator.pushReplacementNamed(context, 'login_screen');
@@ -249,22 +266,47 @@ class _MyContactPageState extends State<MyContactPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xFF383B4E),
-                  hintText: "Cari Kontak...",
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFF383B4E),
+                        hintText: "Cari Kontak...",
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.white),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-                style: const TextStyle(color: Colors.white),
+                  const SizedBox(width: 10),
+                  DropdownButton<String>(
+                    value: _sortOrder,
+                    dropdownColor: const Color(0xFF383B4E),
+                    style: const TextStyle(color: Colors.white),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _sortOrder = newValue!;
+                      });
+                    },
+                    items: <String>['A-Z', 'Z-A']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ),
             Card(
@@ -330,12 +372,15 @@ class _MyContactPageState extends State<MyContactPage> {
                       );
                     }
 
+                    // Apply sorting
+                    final sortedContacts = _sortContacts(filteredContacts);
+
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: filteredContacts.length,
+                      itemCount: sortedContacts.length,
                       itemBuilder: (context, index) {
-                        final contact = filteredContacts[index];
+                        final contact = sortedContacts[index];
                         final nama = contact['nama'] ?? 'Nama tidak tersedia';
                         final no = contact['nomor'] ?? 'nomor tidak tersedia';
 
