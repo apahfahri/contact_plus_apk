@@ -53,8 +53,8 @@ class _AddContactState extends State<AddContact> {
         await FirebaseFirestore.instance.collection('contact').add(contactData);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
+          const SnackBar(
+            content: Text(
               'Data berhasil disimpan',
               style: TextStyle(color: Colors.white),
             ),
@@ -93,12 +93,13 @@ class _AddContactState extends State<AddContact> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        inputDecorationTheme: const InputDecorationTheme(
-          errorStyle:
-              TextStyle(color: Colors.white), // Warna error menjadi putih
+    return Scaffold(
+      backgroundColor: const Color(0xFF23253A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF23253A),
+        title: const Text(
+          'Add My Contact+',
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -108,128 +109,117 @@ class _AddContactState extends State<AddContact> {
           },
         ),
       ),
-      home: Scaffold(
-        backgroundColor: const Color(0xFF23253A),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF23253A),
-          title: const Text(
-            'Add My Contact+',
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Colors.blue, Colors.lightBlueAccent],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 60,
-                      color: Colors.white,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.blue, Colors.lightBlueAccent],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Tambah Kontak',
+                  child: const Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Tambah Kontak',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildInputField(
+                  controller: namaController,
+                  hintText: 'Nama',
+                  icon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: nomerController,
+                  hintText: 'Telepon',
+                  icon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nomor telepon tidak boleh kosong';
+                    } else if (!RegExp(r'^[0-9]{11,}$').hasMatch(value)) {
+                      return 'Data harus berupa angka minimal 11 angka';
+                    }
+                    return null;
+                  },
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+                _buildInputField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  icon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email tidak boleh kosong';
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
+                      return 'Masukkan format email yang benar';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: alamatController,
+                  hintText: 'Alamat',
+                  icon: Icons.location_on,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Alamat tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                _buildInputField(
+                  controller: noteController,
+                  hintText: 'Notes',
+                  icon: Icons.note,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: onSave,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 40),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'Tambah',
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  _buildInputField(
-                    controller: namaController,
-                    hintText: 'Nama',
-                    icon: Icons.person,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildInputField(
-                    controller: nomerController,
-                    hintText: 'Telepon',
-                    icon: Icons.phone,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nomor telepon tidak boleh kosong';
-                      } else if (!RegExp(r'^[0-9]{11,}$').hasMatch(value)) {
-                        return 'Data harus berupa angka minimal 11 angka';
-                      }
-                      return null;
-                    },
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-                  _buildInputField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    icon: Icons.email,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email tidak boleh kosong';
-                      } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                          .hasMatch(value)) {
-                        return 'Masukkan format email yang benar';
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildInputField(
-                    controller: alamatController,
-                    hintText: 'Alamat',
-                    icon: Icons.location_on,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Alamat tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildInputField(
-                    controller: noteController,
-                    hintText: 'Notes',
-                    icon: Icons.note,
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: onSave,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 40),
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      'Tambah',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
