@@ -1,3 +1,4 @@
+import 'package:contact_plus_apk/view/add_contact.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -14,26 +15,91 @@ class MyContactPage extends StatefulWidget {
 
 class _MyContactPageState extends State<MyContactPage> {
   int _selectedIndex = 0;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
 
   late User currentUser;
 
   @override
   void initState() {
-    super.initState();
+    _checkCurrentUser();
     currentUser = widget.user;
     _searchController.addListener(() {
-      setState(() {
-        _searchText = _searchController.text;
-      });
+      setState(() {});
+      _searchText = _searchController.text;
     });
+    super.initState();
+  }
+
+  void _checkCurrentUser() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    } else {
+      // Jika tidak ada pengguna yang login, arahkan ke halaman login
+      Navigator.pushReplacementNamed(context, 'login_page');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF23253A),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(
+                color: Color(0xFF23253A),
+              ),
+              accountName: Text(
+                currentUser.displayName ?? "Nama Pengguna",
+                style: const TextStyle(color: Colors.white),
+              ),
+              accountEmail: Text(
+                currentUser.email ?? "Email Tidak Tersedia",
+                style: const TextStyle(color: Colors.white70),
+              ),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  (currentUser.displayName != null &&
+                          currentUser.displayName!.isNotEmpty)
+                      ? currentUser.displayName![0].toUpperCase()
+                      : "?",
+                  style:
+                      const TextStyle(fontSize: 40, color: Color(0xFF23253A)),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () {
+                Navigator.pushNamed(context, 'dashboard_user');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite),
+              title: const Text("Favorit"),
+              onTap: () {
+                Navigator.pushNamed(context, 'favorite_pages',
+                    arguments: currentUser);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, 'login_page');
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: const Color(0xFF23253A),
         iconTheme: const IconThemeData(
@@ -50,11 +116,30 @@ class _MyContactPageState extends State<MyContactPage> {
           ],
         ),
         actions: [
+          // Animasi Peralihan di bawah ini
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'add_contact');
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      AddContact(user: currentUser),
+                  transitionsBuilder: (context, animation, secondaryAnimation,
+                      child) {
+                    const begin = Offset(3.0, 2.0); // Mulai dari sisi kanan
+                    const end = Offset.zero; // Berhenti di posisi akhir
+                    const curve = Curves.easeInOut;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+
+                    return SlideTransition(position: offsetAnimation, child: child); // Animasi geser
+                  },
+                ),
+              );
             },
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.white),
           ),
         ],
       ),
@@ -80,16 +165,16 @@ class _MyContactPageState extends State<MyContactPage> {
               color: Colors.white,
               tabs: const [
                 GButton(
-                  icon: LineIcons.phone,
-                  text: 'Contact',
+                  icon: LineIcons.home,
+                  text: 'Semua',
                 ),
                 GButton(
-                  icon: LineIcons.heart,
-                  text: 'Favorite',
+                  icon: LineIcons.userFriends,
+                  text: 'Teman',
                 ),
                 GButton(
-                  icon: LineIcons.user,
-                  text: 'Profile',
+                  icon: LineIcons.faceWithoutMouth,
+                  text: 'Keluarga',
                 ),
               ],
               selectedIndex: _selectedIndex,
@@ -97,17 +182,6 @@ class _MyContactPageState extends State<MyContactPage> {
                 setState(() {
                   _selectedIndex = index;
                 });
-                switch (index) {
-                  case 0:
-                    Navigator.pushNamed(context, 'dashboard_user');
-                    break;
-                  case 1:
-                    Navigator.pushNamed(context, 'favorite_pages');
-                    break;
-                  case 2:
-                    Navigator.pushNamed(context, 'profile_pages', arguments: currentUser);
-                    break;
-                }
               },
             ),
           ),
@@ -146,6 +220,7 @@ class _MyContactPageState extends State<MyContactPage> {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('contact')
+                      .where('uid_user', isEqualTo: currentUser.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -167,17 +242,28 @@ class _MyContactPageState extends State<MyContactPage> {
 
                     final contacts = snapshot.data!.docs;
                     final filteredContacts = contacts.where((contact) {
-                      final nama = contact['nama'] ?? '';
-                      final nomorTelepon = contact['nomor'] ?? '';
-                      final email = contact['email'] ?? '';
-                      final alamat = contact['alamat'] ?? '';
-                      final catatan = contact['catatan'] ?? '';
+                      final kategori =
+                          contact['catatan'] ?? ''; // Field kategori
                       final searchLower = _searchText.toLowerCase();
-                      return nama.toLowerCase().contains(searchLower) ||
-                          nomorTelepon.toLowerCase().contains(searchLower) ||
-                          email.toLowerCase().contains(searchLower) ||
-                          alamat.toLowerCase().contains(searchLower) ||
-                          catatan.toLowerCase().contains(searchLower);
+
+                      // Logika filter berdasarkan selectedIndex
+                      final isVisible = (_selectedIndex == 0) ||
+                          (_selectedIndex == 1 && kategori == 'teman') ||
+                          (_selectedIndex == 2 && kategori == 'keluarga');
+
+                      return isVisible &&
+                          ((contact['nama'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['nomor'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['email'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['alamat'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower));
                     }).toList();
 
                     if (filteredContacts.isEmpty) {
@@ -195,7 +281,9 @@ class _MyContactPageState extends State<MyContactPage> {
                       itemCount: filteredContacts.length,
                       itemBuilder: (context, index) {
                         final contact = filteredContacts[index];
+                        final id = contact.id;
                         final nama = contact['nama'] ?? 'Nama tidak tersedia';
+                        final no = contact['nomor'] ?? 'nomor tidak tersedia';
 
                         return Container(
                           padding: const EdgeInsets.all(10),
@@ -207,6 +295,7 @@ class _MyContactPageState extends State<MyContactPage> {
                           child: ListTile(
                             leading: const Icon(Icons.person),
                             title: Text(nama),
+                            subtitle: Text(no),
                             onTap: () {
                               final contactId = contact.id;
                               Navigator.pushNamed(
@@ -219,26 +308,16 @@ class _MyContactPageState extends State<MyContactPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.favorite_border,
-                                      color: Colors.black),
+                                  icon: Icon(
+                                    contact['status'] == 'favorit'
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: contact['status'] == 'favorit'
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
                                   onPressed: () {
-                                    // Logika untuk menambahkan ke favorit
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.black),
-                                  onPressed: () async {
-                                    await FirebaseFirestore.instance
-                                        .collection('contact')
-                                        .doc(contact.id)
-                                        .delete();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Kontak berhasil dihapus'),
-                                      ),
-                                    );
+                                    // Handle favorite toggle
                                   },
                                 ),
                               ],
