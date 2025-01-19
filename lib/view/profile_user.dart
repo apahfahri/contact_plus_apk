@@ -96,7 +96,8 @@ class _ProfileUserState extends State<ProfileUser> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF23253A),
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Profile User', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             onPressed: exportDataToPDF,
