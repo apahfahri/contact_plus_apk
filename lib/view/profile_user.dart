@@ -45,7 +45,7 @@ class _ProfileUserState extends State<ProfileUser> {
       });
     } else {
       // Jika tidak ada pengguna yang login, arahkan ke halaman login
-      Navigator.pushReplacementNamed(context, 'login_page');
+      Navigator.pushReplacementNamed(context, 'login_screen');
     }
   }
 
