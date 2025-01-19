@@ -146,16 +146,16 @@ class _MyContactPageState extends State<MyContactPage> {
               color: Colors.white,
               tabs: const [
                 GButton(
-                  icon: LineIcons.phone,
-                  text: 'Contact',
+                  icon: LineIcons.home,
+                  text: 'Semua',
                 ),
                 GButton(
-                  icon: LineIcons.heart,
-                  text: 'Favorite',
+                  icon: LineIcons.userFriends,
+                  text: 'Teman',
                 ),
                 GButton(
-                  icon: LineIcons.user,
-                  text: 'Profile',
+                  icon: LineIcons.faceWithoutMouth,
+                  text: 'Keluarga',
                 ),
               ],
               selectedIndex: _selectedIndex,
@@ -163,19 +163,6 @@ class _MyContactPageState extends State<MyContactPage> {
                 setState(() {
                   _selectedIndex = index;
                 });
-                switch (index) {
-                  case 0:
-                    Navigator.pushNamed(context, 'dashboard_user');
-                    break;
-                  case 1:
-                    Navigator.pushNamed(context, 'favorite_pages',
-                        arguments: currentUser);
-                    break;
-                  case 2:
-                    Navigator.pushNamed(context, 'profile_pages',
-                        arguments: currentUser);
-                    break;
-                }
               },
             ),
           ),
@@ -236,17 +223,28 @@ class _MyContactPageState extends State<MyContactPage> {
 
                     final contacts = snapshot.data!.docs;
                     final filteredContacts = contacts.where((contact) {
-                      final nama = contact['nama'] ?? '';
-                      final nomorTelepon = contact['nomor'] ?? '';
-                      final email = contact['email'] ?? '';
-                      final alamat = contact['alamat'] ?? '';
-                      final catatan = contact['catatan'] ?? '';
+                      final kategori =
+                          contact['catatan'] ?? ''; // Field kategori
                       final searchLower = _searchText.toLowerCase();
-                      return nama.toLowerCase().contains(searchLower) ||
-                          nomorTelepon.toLowerCase().contains(searchLower) ||
-                          email.toLowerCase().contains(searchLower) ||
-                          alamat.toLowerCase().contains(searchLower) ||
-                          catatan.toLowerCase().contains(searchLower);
+
+                      // Logika filter berdasarkan selectedIndex
+                      final isVisible = (_selectedIndex == 0) ||
+                          (_selectedIndex == 1 && kategori == 'teman') ||
+                          (_selectedIndex == 2 && kategori == 'keluarga');
+
+                      return isVisible &&
+                          ((contact['nama'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['nomor'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['email'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower) ||
+                              (contact['alamat'] ?? '')
+                                  .toLowerCase()
+                                  .contains(searchLower));
                     }).toList();
 
                     if (filteredContacts.isEmpty) {
