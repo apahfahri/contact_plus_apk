@@ -18,8 +18,9 @@ class _ProfileUserState extends State<ProfileUser> {
 
   @override
   void initState() {
-    super.initState();
+    _checkCurrentUser();
     currentUser = widget.user;
+    super.initState();
   }
 
   // Mengunggah gambar
@@ -30,6 +31,18 @@ class _ProfileUserState extends State<ProfileUser> {
       setState(() {
         _imageFile = File(result.files.single.path!);
       });
+    }
+  }
+
+  void _checkCurrentUser() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    } else {
+      // Jika tidak ada pengguna yang login, arahkan ke halaman login
+      Navigator.pushReplacementNamed(context, 'login_page');
     }
   }
 

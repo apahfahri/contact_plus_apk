@@ -18,7 +18,6 @@ import 'package:contact_plus_apk/view/edit_contact.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,8 +45,8 @@ class MainApp extends StatelessWidget {
         'login_screen': (context) => const LoginPage(),
         'register_screen': (context) => const RegisterPage(),
         // 'dashboard_user': (context) => const MyContactPage(user: null,),
-        'add_contact': (context) => const AddContact(),
-        'favorite_pages': (context) => const FavoriteContact(),
+        'add_contact': (context) => AddContact(user: ModalRoute.of(context)!.settings.arguments as User),
+        'favorite_pages': (context) => FavoriteContact(user: ModalRoute.of(context)!.settings.arguments as User),
         'profile_pages': (context) => ProfileUser(user: ModalRoute.of(context)!.settings.arguments as User),
         'detail_contact': (context) => DetailContact(
               contactId: ModalRoute.of(context)?.settings.arguments as String,

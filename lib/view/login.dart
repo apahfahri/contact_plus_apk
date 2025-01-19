@@ -1,5 +1,5 @@
 import 'package:contact_plus_apk/view/MyContactPage.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,8 +12,26 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Instance FirebaseAuth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoggedInUser(); // Cek pengguna saat aplikasi dimulai
+  }
+
+  // Cek apakah ada pengguna yang sudah login
+  void _checkLoggedInUser() {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      // Jika pengguna sudah login, arahkan ke MyContactPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +92,7 @@ class LoginPageState extends State<LoginPage> {
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login, // Call login function
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3A89D5),
                     shape: RoundedRectangleBorder(
@@ -106,7 +124,6 @@ class LoginPageState extends State<LoginPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigasi ke halaman register
                       Navigator.pushNamed(context, 'register_screen');
                     },
                     child: const Text(
@@ -126,14 +143,12 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Fungsi login dengan Firebase
-  Future<void> _login() async { 
+  Future<void> _login() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Melakukan login menggunakan Firebase Auth
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
@@ -141,7 +156,6 @@ class LoginPageState extends State<LoginPage> {
 
       User? user = userCredential.user;
 
-      // Jika login berhasil dan user tidak null, arahkan ke MyContactPage
       if (user != null) {
         Navigator.pushReplacement(
           context,
@@ -153,7 +167,6 @@ class LoginPageState extends State<LoginPage> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Menangani kesalahan login
       String errorMessage = '';
       if (e.code == 'user-not-found') {
         errorMessage =
@@ -163,7 +176,6 @@ class LoginPageState extends State<LoginPage> {
       } else {
         errorMessage = 'Login gagal. Coba lagi.';
       }
-      // Tampilkan pesan kesalahan
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(errorMessage)));
     } finally {
@@ -173,7 +185,6 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Widget untuk membangun TextField
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
