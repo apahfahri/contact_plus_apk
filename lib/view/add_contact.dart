@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 class AddContact extends StatefulWidget {
   final User user;
@@ -52,7 +53,13 @@ class _AddContactState extends State<AddContact> {
         await FirebaseFirestore.instance.collection('contact').add(contactData);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Data berhasil disimpan')),
+          const SnackBar(
+            content: Text(
+              'Data berhasil disimpan',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green, // Warna hijau untuk sukses
+          ),
         );
 
         namaController.clear();
@@ -62,9 +69,25 @@ class _AddContactState extends State<AddContact> {
         noteController.clear();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Terjadi kesalahan: $e')),
+          SnackBar(
+            content: Text(
+              'Terjadi kesalahan: $e',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red, // Warna merah untuk error
+          ),
         );
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Silakan periksa kembali input Anda',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -79,6 +102,12 @@ class _AddContactState extends State<AddContact> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
       ),
       body: Center(
         child: Padding(
@@ -88,13 +117,12 @@ class _AddContactState extends State<AddContact> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Avatar Icon
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [Colors.blue, Colors.lightBlueAccent],
                     ),
                   ),
@@ -114,7 +142,6 @@ class _AddContactState extends State<AddContact> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Input Fields
                 _buildInputField(
                   controller: namaController,
                   hintText: 'Nama',
@@ -139,6 +166,7 @@ class _AddContactState extends State<AddContact> {
                     }
                     return null;
                   },
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
                 _buildInputField(
                   controller: emailController,
@@ -206,6 +234,7 @@ class _AddContactState extends State<AddContact> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
     int maxLines = 1,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -214,6 +243,7 @@ class _AddContactState extends State<AddContact> {
         keyboardType: keyboardType,
         maxLines: maxLines,
         validator: validator,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.blue),
           filled: true,
