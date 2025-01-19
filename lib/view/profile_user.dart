@@ -104,25 +104,6 @@ class _ProfileUserState extends State<ProfileUser> {
                   'Email: ${currentUser.email ?? "email pengguna"}',
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Phone: ${currentUser.phoneNumber ?? "nomor telepon"}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                // Text(
-                //   'Username: ${_username ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
-                // const SizedBox(height: 10),
-                // Text(
-                //   'Email: ${_email ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
-                // const SizedBox(height: 10),
-                // Text(
-                //   'Phone: ${_phone ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
               ],
             ),
           )),
