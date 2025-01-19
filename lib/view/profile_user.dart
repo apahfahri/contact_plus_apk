@@ -52,10 +52,9 @@ class _ProfileUserState extends State<ProfileUser> {
   Future<void> exportDataToPDF() async {
     try {
       final pdf = pw.Document();
-      final data = await FirebaseFirestore.instance
-          .collection('contact')
-          .where('uid_user', isEqualTo: currentUser.uid)
-          .get();
+
+      final data = await FirebaseFirestore.instance.collection('contact').where('uid_user',isEqualTo: currentUser.uid).get();
+
 
       pdf.addPage(pw.Page(
         build: (pw.Context context) {
@@ -66,14 +65,8 @@ class _ProfileUserState extends State<ProfileUser> {
                     style: pw.TextStyle(fontSize: 24)),
                 pw.SizedBox(height: 16),
                 pw.Table.fromTextArray(
-                  headers: [
-                    'ID',
-                    'Nama',
-                    'Nomor Telepon',
-                    'Email',
-                    'Alamat',
-                    'Sebagai'
-                  ],
+
+                  headers: ['ID', 'Nama', 'Nomor Telepon', 'Email', 'Alamat', 'Sebagai'],
                   data: data.docs.map((doc) {
                     final d = doc.data();
                     return [
@@ -95,7 +88,7 @@ class _ProfileUserState extends State<ProfileUser> {
         filename: 'Daftar Kontak_${currentUser.displayName}.pdf',
       );
     } catch (e) {
-      print('Error exporting PDF: $e');
+      print('Error exproting PDF: $e');
     }
   }
 
