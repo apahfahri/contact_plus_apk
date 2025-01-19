@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddContact extends StatefulWidget {
-  const AddContact({super.key});
+  final User user;
+
+  const AddContact({super.key, required this.user});
 
   @override
   State<AddContact> createState() => _AddContactState();
@@ -15,6 +18,13 @@ class _AddContactState extends State<AddContact> {
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late User currentUser;
+
+  @override
+  void initState() {
+    currentUser = widget.user;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -29,11 +39,13 @@ class _AddContactState extends State<AddContact> {
   void onSave() async {
     if (_formKey.currentState!.validate()) {
       final Map<String, dynamic> contactData = {
+        'uid_user': currentUser.uid,
         'nama': namaController.text,
         'nomor': nomerController.text,
         'email': emailController.text,
         'alamat': alamatController.text,
         'catatan': noteController.text,
+        'status': 'no fav',
       };
 
       try {

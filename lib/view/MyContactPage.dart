@@ -14,26 +14,91 @@ class MyContactPage extends StatefulWidget {
 
 class _MyContactPageState extends State<MyContactPage> {
   int _selectedIndex = 0;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
 
   late User currentUser;
 
   @override
   void initState() {
-    super.initState();
+    _checkCurrentUser();
     currentUser = widget.user;
     _searchController.addListener(() {
-      setState(() {
-        _searchText = _searchController.text;
-      });
+      setState(() {});
+      _searchText = _searchController.text;
     });
+    super.initState();
+  }
+
+  void _checkCurrentUser() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    } else {
+      // Jika tidak ada pengguna yang login, arahkan ke halaman login
+      Navigator.pushReplacementNamed(context, 'login_page');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF23253A),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(
+                color: Color(0xFF3A89D5),
+              ),
+              accountName: Text(
+                currentUser.displayName ?? "Nama Pengguna",
+                style: const TextStyle(color: Colors.white),
+              ),
+              accountEmail: Text(
+                currentUser.email ?? "Email Tidak Tersedia",
+                style: const TextStyle(color: Colors.white70),
+              ),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  (currentUser.displayName != null &&
+                          currentUser.displayName!.isNotEmpty)
+                      ? currentUser.displayName![0].toUpperCase()
+                      : "?",
+                  style:
+                      const TextStyle(fontSize: 40, color: Color(0xFF3A89D5)),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () {
+                Navigator.pushNamed(context, 'dashboard_user');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite),
+              title: const Text("Favorit"),
+              onTap: () {
+                Navigator.pushNamed(context, 'favorite_pages',
+                    arguments: currentUser);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, 'login_page');
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: const Color(0xFF23253A),
         iconTheme: const IconThemeData(
@@ -52,9 +117,10 @@ class _MyContactPageState extends State<MyContactPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'add_contact');
+              Navigator.pushNamed(context, 'add_contact',
+                  arguments: currentUser);
             },
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.white),
           ),
         ],
       ),
@@ -102,10 +168,12 @@ class _MyContactPageState extends State<MyContactPage> {
                     Navigator.pushNamed(context, 'dashboard_user');
                     break;
                   case 1:
-                    Navigator.pushNamed(context, 'favorite_pages');
+                    Navigator.pushNamed(context, 'favorite_pages',
+                        arguments: currentUser);
                     break;
                   case 2:
-                    Navigator.pushNamed(context, 'profile_pages', arguments: currentUser);
+                    Navigator.pushNamed(context, 'profile_pages',
+                        arguments: currentUser);
                     break;
                 }
               },
@@ -146,6 +214,7 @@ class _MyContactPageState extends State<MyContactPage> {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('contact')
+                      .where('uid_user', isEqualTo: currentUser.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -195,7 +264,9 @@ class _MyContactPageState extends State<MyContactPage> {
                       itemCount: filteredContacts.length,
                       itemBuilder: (context, index) {
                         final contact = filteredContacts[index];
+                        final id = contact.id;
                         final nama = contact['nama'] ?? 'Nama tidak tersedia';
+                        final no = contact['nomor'] ?? 'nomor tidak tersedia';
 
                         return Container(
                           padding: const EdgeInsets.all(10),
@@ -207,6 +278,7 @@ class _MyContactPageState extends State<MyContactPage> {
                           child: ListTile(
                             leading: const Icon(Icons.person),
                             title: Text(nama),
+                            subtitle: Text(no),
                             onTap: () {
                               final contactId = contact.id;
                               Navigator.pushNamed(
@@ -219,26 +291,71 @@ class _MyContactPageState extends State<MyContactPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.favorite_border,
-                                      color: Colors.black),
-                                  onPressed: () {
-                                    // Logika untuk menambahkan ke favorit
+                                  icon: Icon(
+                                    contact['status'] == 'favorit'
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: contact['status'] == 'favorit'
+                                        ? Colors.red
+                                        : Colors.black,
+                                  ),
+                                  onPressed: () async {
+                                    final newStatus =
+                                        contact['status'] == 'favorit'
+                                            ? 'no fav'
+                                            : 'favorit';
+
+                                    try {
+                                      await FirebaseFirestore.instance
+                                          .collection('contact')
+                                          .doc(id)
+                                          .update({'status': newStatus});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            newStatus == 'favorit'
+                                                ? 'Kontak ditambahkan ke favorit'
+                                                : 'Kontak dihapus dari favorit',
+                                          ),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Gagal memperbarui status favorit'),
+                                        ),
+                                      );
+                                    }
                                   },
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   onPressed: () async {
-                                    await FirebaseFirestore.instance
-                                        .collection('contact')
-                                        .doc(contact.id)
-                                        .delete();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Kontak berhasil dihapus'),
-                                      ),
-                                    );
+                                    try {
+                                      await FirebaseFirestore.instance
+                                          .collection('contact')
+                                          .doc(contact.id)
+                                          .delete();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('Kontak berhasil dihapus'),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('Gagal menghapus kontak'),
+                                        ),
+                                      );
+                                    }
                                   },
                                 ),
                               ],
