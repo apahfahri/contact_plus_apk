@@ -39,6 +39,32 @@ class _DetailContactState extends State<DetailContact> {
     notesController = TextEditingController();
   }
 
+  Widget _buildDetailCard(
+      String title, TextEditingController controller, IconData icon) {
+    return Card(
+      color: const Color(0xFF4A4E69),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              '$title: ${controller.text}',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,13 +98,10 @@ class _DetailContactState extends State<DetailContact> {
         future: fetchContactDetails(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Menampilkan indikator loading saat data sedang dimuat
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Menampilkan error jika terjadi kesalahan
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            // Data berhasil dimuat, menampilkan UI
             final data = snapshot.data;
             nameController.text = data?['nama'] ?? '';
             phoneController.text = data?['nomor'] ?? '';
@@ -118,12 +141,16 @@ class _DetailContactState extends State<DetailContact> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            // Menampilkan data dengan TextEditingController
-                            _buildDetailCard('Nama', nameController),
-                            _buildDetailCard('Nomor Telepon', phoneController),
-                            _buildDetailCard('Email', emailController),
-                            _buildDetailCard('Alamat', addressController),
-                            _buildDetailCard('Catatan', notesController),
+                            _buildDetailCard(
+                                'Nama', nameController, Icons.person),
+                            _buildDetailCard(
+                                'Nomor Telepon', phoneController, Icons.phone),
+                            _buildDetailCard(
+                                'Email', emailController, Icons.email),
+                            _buildDetailCard(
+                                'Alamat', addressController, Icons.location_on),
+                            _buildDetailCard(
+                                'Catatan', notesController, Icons.note),
                           ],
                         ),
                       ),
@@ -136,31 +163,6 @@ class _DetailContactState extends State<DetailContact> {
             return const Center(child: Text('Data tidak ditemukan'));
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildDetailCard(String title, TextEditingController controller) {
-    return Card(
-      color: const Color(0xFF4A4E69),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.info_outline,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              '$title: ${controller.text}',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
       ),
     );
   }
