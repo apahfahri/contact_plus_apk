@@ -100,7 +100,7 @@ class _MyContactPageState extends State<MyContactPage> {
               title: const Text("Logout"),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, 'login_page');
+                Navigator.pushReplacementNamed(context, 'login_screen');
               },
             ),
           ],
