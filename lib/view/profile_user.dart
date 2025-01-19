@@ -52,7 +52,9 @@ class _ProfileUserState extends State<ProfileUser> {
   Future<void> exportDataToPDF() async {
     try {
       final pdf = pw.Document();
+
       final data = await FirebaseFirestore.instance.collection('contact').where('uid_user',isEqualTo: currentUser.uid).get();
+
 
       pdf.addPage(pw.Page(
         build: (pw.Context context) {
@@ -63,6 +65,7 @@ class _ProfileUserState extends State<ProfileUser> {
                     style: pw.TextStyle(fontSize: 24)),
                 pw.SizedBox(height: 16),
                 pw.Table.fromTextArray(
+
                   headers: ['ID', 'Nama', 'Nomor Telepon', 'Email', 'Alamat', 'Sebagai'],
                   data: data.docs.map((doc) {
                     final d = doc.data();
@@ -101,60 +104,74 @@ class _ProfileUserState extends State<ProfileUser> {
         actions: [
           IconButton(
             onPressed: exportDataToPDF,
-            icon: const Icon(Icons.import_export,)
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(context, 'login_screen');
-            },
+            icon: const Icon(Icons.import_export, color: Colors.white),
           ),
         ],
       ),
       body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Column(
-              children: [
-                // Menampilkan gambar profil jika ada
-                _imageFile != null
-                    ? CircleAvatar(
-                        radius: 50,
-                        backgroundImage: FileImage(_imageFile!),
-                      )
-                    : const CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.grey,
-                        child:
-                            Icon(Icons.person, size: 50, color: Colors.white),
-                      ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _uploadImage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3A89D5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Menampilkan gambar profil jika ada
+              _imageFile != null
+                  ? CircleAvatar(
+                      radius: 60,
+                      backgroundImage: FileImage(_imageFile!),
+                    )
+                  : CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey[800],
+                      child: const Icon(Icons.person,
+                          size: 60, color: Colors.white),
                     ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _uploadImage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3A89D5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  child: const Text("Upload Image",
-                      style: TextStyle(color: Colors.white)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
-                const SizedBox(height: 30),
-                // Menampilkan data pengguna
-                Text(
-                  'Username: ${currentUser.displayName ?? "nama pengguna"}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                child: const Text(
+                  "Upload Image",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Email: ${currentUser.email ?? "email pengguna"}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(height: 30),
+              // Menampilkan data pengguna
+              Card(
+                color: const Color(0xFF383B4E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-              ],
-            ),
-          )),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Username: ${currentUser.displayName ?? "Nama Pengguna"}',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Email: ${currentUser.email ?? "Email Pengguna"}',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
