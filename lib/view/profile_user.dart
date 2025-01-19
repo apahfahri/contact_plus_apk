@@ -52,7 +52,7 @@ class _ProfileUserState extends State<ProfileUser> {
   Future<void> exportDataToPDF() async {
     try {
       final pdf = pw.Document();
-      final data = await FirebaseFirestore.instance.collection('contact').get();
+      final data = await FirebaseFirestore.instance.collection('contact').where('uid_user',isEqualTo: currentUser.uid).get();
 
       pdf.addPage(pw.Page(
         build: (pw.Context context) {
@@ -63,15 +63,16 @@ class _ProfileUserState extends State<ProfileUser> {
                     style: pw.TextStyle(fontSize: 24)),
                 pw.SizedBox(height: 16),
                 pw.Table.fromTextArray(
-                  headers: ['ID', 'Author', 'Quantity', 'Title', 'Year'],
+                  headers: ['ID', 'Nama', 'Nomor Telepon', 'Email', 'Alamat', 'Sebagai'],
                   data: data.docs.map((doc) {
                     final d = doc.data();
                     return [
                       doc.id,
-                      d['author'] ?? '',
-                      d['quantity']?.toString() ?? '0',
-                      d['title'] ?? '',
-                      d['year']?.toString() ?? '',
+                      d['nama'] ?? '-',
+                      d['nomor'] ?? '-',
+                      d['email'] ?? '-',
+                      d['alamat'] ?? '-',
+                      d['catatan'] ?? '-',
                     ];
                   }).toList(),
                 )
