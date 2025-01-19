@@ -395,7 +395,7 @@ class _MyContactPageState extends State<MyContactPage> {
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   onPressed: () async {
-                                    
+                    
                                     bool? confirmDelete =
                                         await showDialog<bool>(
                                       context: context,
@@ -448,6 +448,7 @@ class _MyContactPageState extends State<MyContactPage> {
                                           ),
                                         );
                                       }
+
                                     }
                                   },
                                 ),

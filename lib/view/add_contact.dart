@@ -58,7 +58,7 @@ class _AddContactState extends State<AddContact> {
               'Data berhasil disimpan',
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.green, // Warna hijau untuk sukses
+            backgroundColor: Colors.green,
           ),
         );
 
@@ -74,7 +74,7 @@ class _AddContactState extends State<AddContact> {
               'Terjadi kesalahan: $e',
               style: const TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.red, // Warna merah untuk error
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -97,15 +97,7 @@ class _AddContactState extends State<AddContact> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         inputDecorationTheme: const InputDecorationTheme(
-          errorStyle:
-              TextStyle(color: Colors.white), // Warna error menjadi putih
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
-          },
+          errorStyle: TextStyle(color: Colors.white),
         ),
       ),
       home: Scaffold(
@@ -117,6 +109,12 @@ class _AddContactState extends State<AddContact> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context); // Kembali ke halaman sebelumnya
+            },
+          ),
         ),
         body: Center(
           child: Padding(
