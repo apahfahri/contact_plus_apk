@@ -395,26 +395,60 @@ class _MyContactPageState extends State<MyContactPage> {
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   onPressed: () async {
-                                    try {
-                                      await FirebaseFirestore.instance
-                                          .collection('contact')
-                                          .doc(contact.id)
-                                          .delete();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Kontak berhasil dihapus'),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Gagal menghapus kontak'),
-                                        ),
-                                      );
+                    
+                                    bool? confirmDelete =
+                                        await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              'Konfirmasi Penghapusan'),
+                                          content: const Text(
+                                              'Apakah Anda yakin ingin menghapus kontak ini?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pop(false); 
+                                              },
+                                              child: const Text('Batal'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pop(true); 
+                                              },
+                                              child: const Text('Hapus'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    
+                                    if (confirmDelete == true) {
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('contact')
+                                            .doc(contact.id)
+                                            .delete();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content:
+                                                Text('Kontak berhasil dihapus'),
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content:
+                                                Text('Gagal menghapus kontak'),
+                                          ),
+                                        );
+                                      }
+
                                     }
                                   },
                                 ),
