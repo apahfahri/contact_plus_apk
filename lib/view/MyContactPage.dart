@@ -94,7 +94,7 @@ class _MyContactPageState extends State<MyContactPage> {
               title: const Text("Logout"),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, 'login_page');
+                Navigator.pushReplacementNamed(context, 'login_screen');
               },
             ),
           ],
@@ -124,8 +124,8 @@ class _MyContactPageState extends State<MyContactPage> {
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       AddContact(user: currentUser),
-                  transitionsBuilder: (context, animation, secondaryAnimation,
-                      child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     const begin = Offset(3.0, 2.0); // Mulai dari sisi kanan
                     const end = Offset.zero; // Berhenti di posisi akhir
                     const curve = Curves.easeInOut;
@@ -134,7 +134,9 @@ class _MyContactPageState extends State<MyContactPage> {
                         .chain(CurveTween(curve: curve));
                     var offsetAnimation = animation.drive(tween);
 
-                    return SlideTransition(position: offsetAnimation, child: child); // Animasi geser
+                    return SlideTransition(
+                        position: offsetAnimation,
+                        child: child); // Animasi geser
                   },
                 ),
               );
