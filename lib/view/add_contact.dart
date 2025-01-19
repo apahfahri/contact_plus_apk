@@ -100,6 +100,13 @@ class _AddContactState extends State<AddContact> {
           errorStyle:
               TextStyle(color: Colors.white), // Warna error menjadi putih
         ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
       ),
       home: Scaffold(
         backgroundColor: const Color(0xFF23253A),
