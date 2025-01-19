@@ -17,12 +17,16 @@ dependencies:
   firebase_auth: ^5.3.4
   cloud_firestore: 
 
+  #image picker
+  image_picker: 
+
   #icons
   line_icons: ^2.0.3
   file_picker: ^8.1.7
   device_preview: ^1.2.0
   pdf: ^3.11.1
   printing: ^5.13.4
+  firebase_storage: ^12.4.0
   
 
 dev_dependencies:

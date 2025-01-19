@@ -1,11 +1,11 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
-  
 
   @override
   RegisterPageState createState() => RegisterPageState();
@@ -19,7 +19,7 @@ class RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  late PhoneAuthCredential phone = _phoneController as PhoneAuthCredential;
+  
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
@@ -29,21 +29,34 @@ class RegisterPageState extends State<RegisterPage> {
 
       try {
         // Firebase register logic
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
-        await FirebaseAuth.instance.currentUser!
-            .updateDisplayName(_usernameController.text);
-        await FirebaseAuth.instance.currentUser!
-            .updatePhoneNumber(phone);
+  
+
+      // Cek UID yang dihasilkan
+        String userId = credential.user!.uid;
+        print('User ID: $userId'); // Tambahkan ini untuk debug
+
+         // Save additional user data in Firestore
+          await FirebaseFirestore.instance
+              .collection('user')
+              .doc(userId)
+              .set({
+                'nama' : _usernameController.text,
+                'email' : _emailController.text,
+                'phone' : _phoneController.text,
+                'uid' : userId,
+                'profile_picture' : '',
+          });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
         );
 
         // Navigate to login or home
-        Navigator.pushReplacementNamed(context, 'login_screen');
+        Navigator.pushNamed(context, 'login_screen');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
@@ -155,8 +168,8 @@ class RegisterPageState extends State<RegisterPage> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, 'login_screen');
+                      onPressed: () async {
+                       await Navigator.pushNamed(context, 'login_screen');
                       },
                       child: const Text(
                         'Sign In',

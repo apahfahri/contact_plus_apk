@@ -14,7 +14,7 @@ class _FavoriteContactState extends State<FavoriteContact> {
   late User currentUser;
 
   final TextEditingController _searchController = TextEditingController();
-  String _searchText = "";
+  final String _searchText = "";
 
   @override
   void initState() {

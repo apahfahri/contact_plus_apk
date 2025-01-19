@@ -53,8 +53,8 @@ class _AddContactState extends State<AddContact> {
         await FirebaseFirestore.instance.collection('contact').add(contactData);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
+          const SnackBar(
+            content: Text(
               'Data berhasil disimpan',
               style: TextStyle(color: Colors.white),
             ),
@@ -127,9 +127,9 @@ class _AddContactState extends State<AddContact> {
                   Container(
                     width: 100,
                     height: 100,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         colors: [Colors.blue, Colors.lightBlueAccent],
                       ),
                     ),

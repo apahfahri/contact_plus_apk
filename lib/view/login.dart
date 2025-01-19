@@ -22,14 +22,25 @@ class LoginPageState extends State<LoginPage> {
   }
 
   // Cek apakah ada pengguna yang sudah login
+  // void _checkLoggedInUser() {
+  //   User? user = _auth.currentUser;
+  //   if (user != null) {
+  //     // Jika pengguna sudah login, arahkan ke MyContactPage
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
+  //     );
+  //   }
+  // }
   void _checkLoggedInUser() {
     User? user = _auth.currentUser;
     if (user != null) {
-      // Jika pengguna sudah login, arahkan ke MyContactPage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
+        );
+      });
     }
   }
 
@@ -157,7 +168,7 @@ class LoginPageState extends State<LoginPage> {
       User? user = userCredential.user;
 
       if (user != null) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyContactPage(user: user)),
         );
