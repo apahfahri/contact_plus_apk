@@ -21,6 +21,8 @@ dependencies:
   line_icons: ^2.0.3
   file_picker: ^8.1.7
   device_preview: ^1.2.0
+  pdf: ^3.11.1
+  printing: ^5.13.4
   
 
 dev_dependencies:

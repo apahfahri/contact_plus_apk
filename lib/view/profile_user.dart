@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class ProfileUser extends StatefulWidget {
   final User user;
@@ -46,6 +49,45 @@ class _ProfileUserState extends State<ProfileUser> {
     }
   }
 
+  Future<void> exportDataToPDF() async {
+    try {
+      final pdf = pw.Document();
+      final data = await FirebaseFirestore.instance.collection('contact').get();
+
+      pdf.addPage(pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Daftar kontak dari akun ${currentUser.displayName}',
+                    style: pw.TextStyle(fontSize: 24)),
+                pw.SizedBox(height: 16),
+                pw.Table.fromTextArray(
+                  headers: ['ID', 'Author', 'Quantity', 'Title', 'Year'],
+                  data: data.docs.map((doc) {
+                    final d = doc.data();
+                    return [
+                      doc.id,
+                      d['author'] ?? '',
+                      d['quantity']?.toString() ?? '0',
+                      d['title'] ?? '',
+                      d['year']?.toString() ?? '',
+                    ];
+                  }).toList(),
+                )
+              ]);
+        },
+      ));
+
+      await Printing.sharePdf(
+        bytes: await pdf.save(),
+        filename: 'Daftar Kontak_${currentUser.displayName}.pdf',
+      );
+    } catch (e) {
+      print('Error exproting PDF: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +97,10 @@ class _ProfileUserState extends State<ProfileUser> {
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         actions: [
+          IconButton(
+            onPressed: exportDataToPDF,
+            icon: const Icon(Icons.import_export,)
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
