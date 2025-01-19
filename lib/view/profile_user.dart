@@ -45,14 +45,14 @@ class _ProfileUserState extends State<ProfileUser> {
       });
     } else {
       // Jika tidak ada pengguna yang login, arahkan ke halaman login
-      Navigator.pushReplacementNamed(context, 'login_page');
+      Navigator.pushReplacementNamed(context, 'login_screen');
     }
   }
 
   Future<void> exportDataToPDF() async {
     try {
       final pdf = pw.Document();
-      final data = await FirebaseFirestore.instance.collection('contact').get();
+      final data = await FirebaseFirestore.instance.collection('contact').where('uid_user',isEqualTo: currentUser.uid).get();
 
       pdf.addPage(pw.Page(
         build: (pw.Context context) {
@@ -63,15 +63,16 @@ class _ProfileUserState extends State<ProfileUser> {
                     style: pw.TextStyle(fontSize: 24)),
                 pw.SizedBox(height: 16),
                 pw.Table.fromTextArray(
-                  headers: ['ID', 'Author', 'Quantity', 'Title', 'Year'],
+                  headers: ['ID', 'Nama', 'Nomor Telepon', 'Email', 'Alamat', 'Sebagai'],
                   data: data.docs.map((doc) {
                     final d = doc.data();
                     return [
                       doc.id,
-                      d['author'] ?? '',
-                      d['quantity']?.toString() ?? '0',
-                      d['title'] ?? '',
-                      d['year']?.toString() ?? '',
+                      d['nama'] ?? '-',
+                      d['nomor'] ?? '-',
+                      d['email'] ?? '-',
+                      d['alamat'] ?? '-',
+                      d['catatan'] ?? '-',
                     ];
                   }).toList(),
                 )
@@ -150,25 +151,6 @@ class _ProfileUserState extends State<ProfileUser> {
                   'Email: ${currentUser.email ?? "email pengguna"}',
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Phone: ${currentUser.phoneNumber ?? "nomor telepon"}',
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                // Text(
-                //   'Username: ${_username ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
-                // const SizedBox(height: 10),
-                // Text(
-                //   'Email: ${_email ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
-                // const SizedBox(height: 10),
-                // Text(
-                //   'Phone: ${_phone ?? "Loading..."}',
-                //   style: const TextStyle(color: Colors.white, fontSize: 18),
-                // ),
               ],
             ),
           )),

@@ -39,7 +39,7 @@ class _MyContactPageState extends State<MyContactPage> {
       });
     } else {
       // Jika tidak ada pengguna yang login, arahkan ke halaman login
-      Navigator.pushReplacementNamed(context, 'login_page');
+      Navigator.pushReplacementNamed(context, 'login_screen');
     }
   }
 
