@@ -79,6 +79,12 @@ class _AddContactState extends State<AddContact> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
       ),
       body: Center(
         child: Padding(

@@ -1,3 +1,4 @@
+import 'package:contact_plus_apk/view/add_contact.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -51,7 +52,7 @@ class _MyContactPageState extends State<MyContactPage> {
           children: [
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(
-                color: Color(0xFF3A89D5),
+                color: Color(0xFF23253A),
               ),
               accountName: Text(
                 currentUser.displayName ?? "Nama Pengguna",
@@ -69,7 +70,7 @@ class _MyContactPageState extends State<MyContactPage> {
                       ? currentUser.displayName![0].toUpperCase()
                       : "?",
                   style:
-                      const TextStyle(fontSize: 40, color: Color(0xFF3A89D5)),
+                      const TextStyle(fontSize: 40, color: Color(0xFF23253A)),
                 ),
               ),
             ),
@@ -115,10 +116,28 @@ class _MyContactPageState extends State<MyContactPage> {
           ],
         ),
         actions: [
+          // Animasi Peralihan di bawah ini
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'add_contact',
-                  arguments: currentUser);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      AddContact(user: currentUser),
+                  transitionsBuilder: (context, animation, secondaryAnimation,
+                      child) {
+                    const begin = Offset(3.0, 2.0); // Mulai dari sisi kanan
+                    const end = Offset.zero; // Berhenti di posisi akhir
+                    const curve = Curves.easeInOut;
+
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+
+                    return SlideTransition(position: offsetAnimation, child: child); // Animasi geser
+                  },
+                ),
+              );
             },
             icon: const Icon(Icons.add, color: Colors.white),
           ),
@@ -297,65 +316,10 @@ class _MyContactPageState extends State<MyContactPage> {
                                         : Icons.favorite_border,
                                     color: contact['status'] == 'favorit'
                                         ? Colors.red
-                                        : Colors.black,
+                                        : Colors.grey,
                                   ),
-                                  onPressed: () async {
-                                    final newStatus =
-                                        contact['status'] == 'favorit'
-                                            ? 'no fav'
-                                            : 'favorit';
-
-                                    try {
-                                      await FirebaseFirestore.instance
-                                          .collection('contact')
-                                          .doc(id)
-                                          .update({'status': newStatus});
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            newStatus == 'favorit'
-                                                ? 'Kontak ditambahkan ke favorit'
-                                                : 'Kontak dihapus dari favorit',
-                                          ),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Gagal memperbarui status favorit'),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.black),
-                                  onPressed: () async {
-                                    try {
-                                      await FirebaseFirestore.instance
-                                          .collection('contact')
-                                          .doc(contact.id)
-                                          .delete();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Kontak berhasil dihapus'),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Gagal menghapus kontak'),
-                                        ),
-                                      );
-                                    }
+                                  onPressed: () {
+                                    // Handle favorite toggle
                                   },
                                 ),
                               ],
